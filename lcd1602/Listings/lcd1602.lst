@@ -1,0 +1,298 @@
+C51 COMPILER V9.54   LCD1602                                                               06/23/2025 14:31:33 PAGE 1   
+
+
+C51 COMPILER V9.54, COMPILATION OF MODULE LCD1602
+OBJECT MODULE PLACED IN .\Objects\lcd1602.obj
+COMPILER INVOKED BY: F:\Keil_v5\C51\BIN\C51.EXE lcd1602.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\l
+                    -cd1602.lst) TABS(2) OBJECT(.\Objects\lcd1602.obj)
+
+line level    source
+
+   1          #include <reg52.h>
+   2          #include <intrins.h>
+   3          
+   4          // 定义LCD1602引脚
+   5          sbit RS = P1^2;      // 寄存器选择信号
+   6          sbit RW = P1^1;      // 读写控制信号
+   7          sbit EN = P1^0;      // 使能信号
+   8          #define LCD_DATA P2  // 数据端口
+   9          
+  10          // 定义舵机控制引脚和按钮引脚
+  11          sbit SG90_PIN = P0^0;      // 舵机信号线连接到P1.3
+  12          sbit BUTTON1 = P3^2;       // 按钮1，连接到P3.2
+  13          sbit BUTTON2 = P3^3;       // 按钮2，连接到P3.3
+  14          sbit BUTTON3 = P3^4;       // 按钮3，连接到P3.4
+  15          
+  16          // 定义舵机角度对应的PWM值
+  17          // 为了调试，我们使用更精确的PWM值
+  18          #define ANGLE_0     460   // 0度对应的计数值
+  19          #define ANGLE_45    730   // 45度对应的计数值
+  20          #define ANGLE_90    1000  // 90度对应的计数值
+  21          #define ANGLE_135   1270  // 135度对应的计数值
+  22          #define ANGLE_180   1540  // 180度对应的计数值
+  23          
+  24          // 全局变量
+  25          unsigned int angle_value = ANGLE_90;  // 当前舵机角度值，默认为90度
+  26          bit pwm_output = 0;                   // PWM输出状态
+  27          unsigned int pwm_count = 0;           // PWM计数器
+  28          unsigned char debug_state = 0;        // 调试状态变量
+  29          
+  30          // 函数声明
+  31          void Delay_ms(unsigned int ms);
+  32          void LCD_WriteCmd(unsigned char cmd);
+  33          void LCD_WriteData(unsigned char dat);
+  34          void LCD_Init(void);
+  35          void LCD_SetCursor(unsigned char line, unsigned char column);
+  36          void LCD_ShowString(unsigned char line, unsigned char column, unsigned char *str);
+  37          void LCD_ShowNum(unsigned char line, unsigned char column, unsigned int num, unsigned char len);
+  38          void Timer0_Init(void);
+  39          void Key_Scan(void);
+  40          void Servo_Test(void);
+  41          
+  42          // 延时函数
+  43          void Delay_ms(unsigned int ms)
+  44          {
+  45   1          unsigned int i, j;
+  46   1          for(i = 0; i < ms; i++)
+  47   1              for(j = 0; j < 110; j++);
+  48   1      }
+  49          
+  50          // LCD1602写命令函数
+  51          void LCD_WriteCmd(unsigned char cmd)
+  52          {
+  53   1          RS = 0;       // 选择命令寄存器
+  54   1          RW = 0;       // 写操作
+C51 COMPILER V9.54   LCD1602                                                               06/23/2025 14:31:33 PAGE 2   
+
+  55   1          LCD_DATA = cmd;
+  56   1          EN = 1;       // 使能信号高电平
+  57   1          Delay_ms(5);
+  58   1          EN = 0;       // 使能信号低电平
+  59   1      }
+  60          
+  61          // LCD1602写数据函数
+  62          void LCD_WriteData(unsigned char dat)
+  63          {
+  64   1          RS = 1;       // 选择数据寄存器
+  65   1          RW = 0;       // 写操作
+  66   1          LCD_DATA = dat;
+  67   1          EN = 1;       // 使能信号高电平
+  68   1          Delay_ms(5);
+  69   1          EN = 0;       // 使能信号低电平
+  70   1      }
+  71          
+  72          // LCD1602初始化函数
+  73          void LCD_Init()
+  74          {
+  75   1          Delay_ms(15);     // 等待LCD1602初始化完成
+  76   1          LCD_WriteCmd(0x38); // 设置16x2显示，5x7点阵，8位数据接口
+  77   1          Delay_ms(5);
+  78   1          LCD_WriteCmd(0x38);
+  79   1          Delay_ms(5);
+  80   1          LCD_WriteCmd(0x38);
+  81   1          LCD_WriteCmd(0x0C); // 显示开，光标关，闪烁关
+  82   1          LCD_WriteCmd(0x06); // 写入新数据后光标右移，显示不移动
+  83   1          LCD_WriteCmd(0x01); // 清屏
+  84   1          Delay_ms(2);
+  85   1      }
+  86          
+  87          // 设置LCD1602显示位置
+  88          void LCD_SetCursor(unsigned char line, unsigned char column)
+  89          {
+  90   1          if(line == 1)
+  91   1              LCD_WriteCmd(0x80 + column - 1);
+  92   1          else if(line == 2)
+  93   1              LCD_WriteCmd(0xC0 + column - 1);
+  94   1      }
+  95          
+  96          // 在LCD1602上显示字符串
+  97          void LCD_ShowString(unsigned char line, unsigned char column, unsigned char *str)
+  98          {
+  99   1          LCD_SetCursor(line, column);
+ 100   1          while(*str != '\0')
+ 101   1          {
+ 102   2              LCD_WriteData(*str++);
+ 103   2          }
+ 104   1      }
+ 105          
+ 106          // 在LCD1602上显示数字
+ 107          void LCD_ShowNum(unsigned char line, unsigned char column, unsigned int num, unsigned char len)
+ 108          {
+ 109   1          unsigned char i;
+ 110   1          LCD_SetCursor(line, column);
+ 111   1          for(i = 0; i < len; i++)
+ 112   1          {
+ 113   2              LCD_WriteData('0' + num / 10000 % 10);
+ 114   2              num = num * 10;
+ 115   2          }
+ 116   1      }
+C51 COMPILER V9.54   LCD1602                                                               06/23/2025 14:31:33 PAGE 3   
+
+ 117          
+ 118          // 定时器0初始化，用于产生PWM信号
+ 119          void Timer0_Init(void)
+ 120          {
+ 121   1          TMOD = 0x01;    // 设置定时器0为16位模式
+ 122   1          TH0 = 0xFC;     // 定时1ms的初值(11.0592MHz晶振)
+ 123   1          TL0 = 0x66;
+ 124   1          ET0 = 1;        // 使能定时器0中断
+ 125   1          EA = 1;         // 开总中断
+ 126   1          TR0 = 1;        // 启动定时器0
+ 127   1      }
+ 128          
+ 129          // 按键扫描函数
+ 130          void Key_Scan(void)
+ 131          {
+ 132   1          // 检测按钮1是否按下（转到0度）
+ 133   1          if(BUTTON1 == 0)
+ 134   1          {
+ 135   2              Delay_ms(10);  // 消抖
+ 136   2              if(BUTTON1 == 0)
+ 137   2              {
+ 138   3                  while(!BUTTON1);  // 等待按键释放
+ 139   3                  angle_value = ANGLE_0;  // 设置舵机角度为0度
+ 140   3                  LCD_ShowString(1, 1, "Hello, World!");
+ 141   3                  LCD_ShowString(2, 1, "button1:0");
+ 142   3              }
+ 143   2          }
+ 144   1          
+ 145   1          // 检测按钮2是否按下（转到90度）
+ 146   1          if(BUTTON2 == 0)
+ 147   1          {
+ 148   2              Delay_ms(10);  // 消抖
+ 149   2              if(BUTTON2 == 0)
+ 150   2              {
+ 151   3                  while(!BUTTON2);  // 等待按键释放
+ 152   3                  angle_value = ANGLE_90;  // 设置舵机角度为90度
+ 153   3                  LCD_ShowString(1, 1, "Hello, World!");
+ 154   3                  LCD_ShowString(2, 1, "button2:90");
+ 155   3              }
+ 156   2          }
+ 157   1          
+ 158   1          // 检测按钮3是否按下（转到180度）
+ 159   1          if(BUTTON3 == 0)
+ 160   1          {
+ 161   2              Delay_ms(10);  // 消抖
+ 162   2              if(BUTTON3 == 0)
+ 163   2              {
+ 164   3                  while(!BUTTON3);  // 等待按键释放
+ 165   3                  angle_value = ANGLE_180;  // 设置舵机角度为180度
+ 166   3                  LCD_ShowString(1, 1, "Hello, World!");
+ 167   3                  LCD_ShowString(2, 1, "button3:180");
+ 168   3              }
+ 169   2          }
+ 170   1      }
+ 171          
+ 172          // 舵机测试函数
+ 173          void Servo_Test(void)
+ 174          {
+ 175   1          // 每500ms改变一次舵机角度，用于测试
+ 176   1          static unsigned int test_count = 0;
+ 177   1          
+ 178   1          test_count++;
+C51 COMPILER V9.54   LCD1602                                                               06/23/2025 14:31:33 PAGE 4   
+
+ 179   1          if(test_count >= 50)  // 50 * 10ms = 500ms
+ 180   1          {
+ 181   2              test_count = 0;
+ 182   2              debug_state++;
+ 183   2              
+ 184   2              if(debug_state > 4)
+ 185   2                  debug_state = 0;
+ 186   2                  
+ 187   2              switch(debug_state)
+ 188   2              {
+ 189   3                  case 0:
+ 190   3                      angle_value = ANGLE_0;
+ 191   3                      LCD_ShowString(2, 1, "Test: 0   ");
+ 192   3                      break;
+ 193   3                  case 1:
+ 194   3                      angle_value = ANGLE_45;
+ 195   3                      LCD_ShowString(2, 1, "Test: 45  ");
+ 196   3                      break;
+ 197   3                  case 2:
+ 198   3                      angle_value = ANGLE_90;
+ 199   3                      LCD_ShowString(2, 1, "Test: 90  ");
+ 200   3                      break;
+ 201   3                  case 3:
+ 202   3                      angle_value = ANGLE_135;
+ 203   3                      LCD_ShowString(2, 1, "Test: 135 ");
+ 204   3                      break;
+ 205   3                  case 4:
+ 206   3                      angle_value = ANGLE_180;
+ 207   3                      LCD_ShowString(2, 1, "Test: 180 ");
+ 208   3                      break;
+ 209   3              }
+ 210   2          }
+ 211   1      }
+ 212          
+ 213          // 定时器0中断服务函数，用于产生PWM信号
+ 214          void Timer0_ISR(void) interrupt 1
+ 215          {
+ 216   1          // 重新加载定时器初值，定时1ms
+ 217   1          TH0 = 0xFC;
+ 218   1          TL0 = 0x66;
+ 219   1          
+ 220   1          // PWM周期为20ms(50Hz)
+ 221   1          pwm_count++;
+ 222   1          if(pwm_count >= 20)
+ 223   1          {
+ 224   2              pwm_count = 0;
+ 225   2          }
+ 226   1          
+ 227   1          // 根据当前角度值产生PWM信号
+ 228   1          if(pwm_count < (angle_value / 100))  // 缩放计数值以适应PWM周期
+ 229   1          {
+ 230   2              SG90_PIN = 1;  // 输出高电平
+ 231   2          }
+ 232   1          else
+ 233   1          {
+ 234   2              SG90_PIN = 0;  // 输出低电平
+ 235   2          }
+ 236   1      }
+ 237          
+ 238          // 主函数
+ 239          void main()
+ 240          {
+C51 COMPILER V9.54   LCD1602                                                               06/23/2025 14:31:33 PAGE 5   
+
+ 241   1          LCD_Init(); // 初始化LCD1602
+ 242   1          Timer0_Init(); // 初始化定时器
+ 243   1          
+ 244   1          // 初始状态，舵机转到90度位置
+ 245   1          angle_value = ANGLE_90;
+ 246   1          LCD_ShowString(1, 1, "Hello, World!");
+ 247   1          LCD_ShowString(2, 1, "button2:90");
+ 248   1          
+ 249   1          // 延时2秒，确保舵机有足够时间转到初始位置
+ 250   1          Delay_ms(2000);
+ 251   1          
+ 252   1          // 显示测试提示
+ 253   1          LCD_ShowString(1, 1, "Servo Test...");
+ 254   1          
+ 255   1          while(1)
+ 256   1          {
+ 257   2              // 舵机测试，自动循环不同角度
+ 258   2              Servo_Test();
+ 259   2              
+ 260   2              // 扫描按键
+ 261   2              Key_Scan();
+ 262   2              
+ 263   2              // 延时10ms
+ 264   2              Delay_ms(10);
+ 265   2          }
+ 266   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    648    ----
+   CONSTANT SIZE    =    116    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      7      10
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =      1    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
