@@ -1,0 +1,58 @@
+C51 COMPILER V9.54   OLED_IMAGE                                                            06/25/2025 16:37:28 PAGE 1   
+
+
+C51 COMPILER V9.54, COMPILATION OF MODULE OLED_IMAGE
+OBJECT MODULE PLACED IN .\Objects\oled_image.obj
+COMPILER INVOKED BY: F:\Keil_v5\C51\BIN\C51.EXE oled_image.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listing
+                    -s\oled_image.lst) TABS(2) OBJECT(.\Objects\oled_image.obj)
+
+line level    source
+
+   1          #include "oled.h"
+   2          #define OLED_WIDTH 128
+   3          #define OLED_HEIGHT 64
+   4          
+   5          // 输入：灰度图（64行*128列），阈值；输出：oled点阵缓冲区（8页×128列）
+   6          // 参数改为指针，内部使用时按一维数组访问
+   7          void GrayToOledBinary(const unsigned char *gray_img, unsigned char *oled_buf, unsigned char threshold) {
+   8   1          unsigned char page, col, bit0;
+   9   1          for (page = 0; page < 8; page++) {
+  10   2              for (col = 0; col < 128; col++) {
+  11   3                  unsigned char byte = 0;
+  12   3                  for (bit0 = 0; bit0 < 8; bit0++) {
+  13   4                      unsigned char row = page * 8 + bit0;
+  14   4                      // gray_img[row][col] 变成 *(gray_img + row*128 + col)
+  15   4                      if (*(gray_img + row*128 + col) > threshold) {
+  16   5                          byte |= (1 << bit0);
+  17   5                      }
+  18   4                  }
+  19   3                  // oled_buf[page][col] 改成 *(oled_buf + page*128 + col)
+  20   3                  *(oled_buf + page*128 + col) = byte;
+  21   3              }
+  22   2          }
+  23   1      }
+  24          
+  25          void OLED_ShowImage(const unsigned char *oled_buf) {
+  26   1          unsigned char page, col;
+  27   1          for (page = 0; page < 8; page++) {
+  28   2              OLED_SetPos(0, page);
+  29   2              for (col = 0; col < 128; col++) {
+  30   3                  OLED_WriteData(*(oled_buf + page*128 + col));
+  31   3              }
+  32   2          }
+  33   1      }
+  34          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    196    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----      17
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

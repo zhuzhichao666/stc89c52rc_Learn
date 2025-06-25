@@ -1,0 +1,7 @@
+".\Objects\STARTUP.obj",
+".\Objects\iic.obj",
+".\Objects\main.obj",
+".\Objects\oled.obj",
+".\Objects\oled_image.obj" 
+TO ".\Objects\oledlearn" 
+PRINT(".\Listings\oledlearn.m51") RAMSIZE(256) 

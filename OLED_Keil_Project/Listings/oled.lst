@@ -1,0 +1,105 @@
+C51 COMPILER V9.54   OLED                                                                  06/25/2025 16:37:28 PAGE 1   
+
+
+C51 COMPILER V9.54, COMPILATION OF MODULE OLED
+OBJECT MODULE PLACED IN .\Objects\oled.obj
+COMPILER INVOKED BY: F:\Keil_v5\C51\BIN\C51.EXE oled.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\oled
+                    -.lst) TABS(2) OBJECT(.\Objects\oled.obj)
+
+line level    source
+
+   1          #include "oled.h"
+   2          #include "iic.h"
+   3          #include "ascii.h"
+   4          
+   5          #define OLED_ADDRESS 0x78
+   6          
+   7          void OLED_WriteCmd(unsigned char cmd) {
+   8   1          IIC_Start();
+   9   1          IIC_SendByte(OLED_ADDRESS);
+  10   1          IIC_SendByte(0x00);
+  11   1          IIC_SendByte(cmd);
+  12   1          IIC_Stop();
+  13   1      }
+  14          
+  15          void OLED_WriteData(unsigned char dat) {
+  16   1          IIC_Start();
+  17   1          IIC_SendByte(OLED_ADDRESS);
+  18   1          IIC_SendByte(0x40);
+  19   1          IIC_SendByte(dat);
+  20   1          IIC_Stop();
+  21   1      }
+  22          
+  23          void OLED_SetPos(unsigned char x, unsigned char y) {
+  24   1          OLED_WriteCmd(0xB0 + y);
+  25   1          OLED_WriteCmd(((x & 0xF0) >> 4) | 0x10);
+  26   1          OLED_WriteCmd((x & 0x0F) | 0x01);
+  27   1      }
+  28          
+  29          void OLED_Clear(void) {
+  30   1          unsigned char x,y;
+  31   1          for (y = 0; y < 8; y++) {
+  32   2              OLED_SetPos(0, y);
+  33   2              for (x = 0; x < 128; x++) {
+  34   3                  OLED_WriteData(0x00);
+  35   3              }
+  36   2          }
+  37   1      }
+  38          
+  39          void OLED_ShowChar(unsigned char x, unsigned char y, char chr) {
+  40   1          unsigned char c = chr - ' ';
+  41   1          unsigned char i;
+  42   1          OLED_SetPos(x, y);
+  43   1          for (i = 0; i < 6; i++) {
+  44   2              OLED_WriteData(AsciiTable[c][i]);
+  45   2          }
+  46   1      }
+  47          
+  48          void OLED_ShowString(unsigned char x, unsigned char y, char *str) {
+  49   1          while (*str) {
+  50   2              OLED_ShowChar(x, y, *str++);
+  51   2              x += 6;
+  52   2              if (x > 122) {
+  53   3                  x = 0;
+  54   3                  y++;
+C51 COMPILER V9.54   OLED                                                                  06/25/2025 16:37:28 PAGE 2   
+
+  55   3              }
+  56   2          }
+  57   1      }
+  58          
+  59          void OLED_Init(void) {
+  60   1          OLED_WriteCmd(0xAE);
+  61   1          OLED_WriteCmd(0x20); OLED_WriteCmd(0x10);
+  62   1          OLED_WriteCmd(0xB0);
+  63   1          OLED_WriteCmd(0xC8);
+  64   1          OLED_WriteCmd(0x00); OLED_WriteCmd(0x10);
+  65   1          OLED_WriteCmd(0x40);
+  66   1          OLED_WriteCmd(0x81); OLED_WriteCmd(0xFF);
+  67   1          OLED_WriteCmd(0xA1);
+  68   1          OLED_WriteCmd(0xA6);
+  69   1          OLED_WriteCmd(0xA8); OLED_WriteCmd(0x3F);
+  70   1          OLED_WriteCmd(0xA4);
+  71   1          OLED_WriteCmd(0xD3); OLED_WriteCmd(0x00);
+  72   1          OLED_WriteCmd(0xD5); OLED_WriteCmd(0xF0);
+  73   1          OLED_WriteCmd(0xD9); OLED_WriteCmd(0x22);
+  74   1          OLED_WriteCmd(0xDA); OLED_WriteCmd(0x12);
+  75   1          OLED_WriteCmd(0xDB); OLED_WriteCmd(0x20);
+  76   1          OLED_WriteCmd(0x8D); OLED_WriteCmd(0x14);
+  77   1          OLED_WriteCmd(0xAF);
+  78   1          OLED_Clear();
+  79   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    373    ----
+   CONSTANT SIZE    =    570    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----      12
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
