@@ -1,0 +1,358 @@
+BL51 BANKED LINKER/LOCATER V6.22                                                        06/11/2025  22:01:14  PAGE 1
+
+
+BL51 BANKED LINKER/LOCATER V6.22, INVOKED BY:
+F:\KEIL\C51\BIN\BL51.EXE .\Objects\STARTUP.obj, .\Objects\beep.obj TO .\Objects\beep PRINT (.\Listings\beep.m51)
+
+
+MEMORY MODEL: SMALL
+
+
+INPUT MODULES INCLUDED:
+  .\Objects\STARTUP.obj (?C_STARTUP)
+  .\Objects\beep.obj (BEEP)
+  F:\KEIL\C51\LIB\C51S.LIB (?C_INIT)
+  F:\KEIL\C51\LIB\C51S.LIB (?C?ULDIV)
+  F:\KEIL\C51\LIB\C51S.LIB (?C?SLCMP)
+  F:\KEIL\C51\LIB\C51S.LIB (?C?LIMUL)
+
+
+LINK MAP OF MODULE:  .\Objects\beep (?C_STARTUP)
+
+
+            TYPE    BASE      LENGTH    RELOCATION   SEGMENT NAME
+            -----------------------------------------------------
+
+            * * * * * * *   D A T A   M E M O R Y   * * * * * * *
+            REG     0000H     0008H     ABSOLUTE     "REG BANK 0"
+            DATA    0008H     0013H     UNIT         _DATA_GROUP_
+            DATA    001BH     0004H     UNIT         ?DT?BEEP
+                    001FH     0001H                  *** GAP ***
+            BIT     0020H.0   0000H.1   UNIT         ?BI?BEEP
+            BIT     0020H.1   0000H.1   UNIT         _BIT_GROUP_
+                    0020H.2   0000H.6                *** GAP ***
+            IDATA   0021H     0001H     UNIT         ?STACK
+
+            * * * * * * *   C O D E   M E M O R Y   * * * * * * *
+            CODE    0000H     0003H     ABSOLUTE     
+                    0003H     0008H                  *** GAP ***
+            CODE    000BH     0003H     ABSOLUTE     
+                    000EH     07F2H                  *** GAP ***
+            CODE    0800H     0145H     UNIT         ?PR?MAIN?BEEP
+            CODE    0945H     0111H     UNIT         ?C?LIB_CODE
+            CODE    0A56H     008CH     UNIT         ?C_C51STARTUP
+            CODE    0AE2H     006DH     UNIT         ?PR?KEYSCAN?BEEP
+            CODE    0B4FH     0062H     UNIT         ?PR?_PLAYNOTE?BEEP
+            CODE    0BB1H     005CH     UNIT         ?CO?BEEP
+            CODE    0C0DH     0038H     UNIT         ?PR?_PLAYSONG?BEEP
+            CODE    0C45H     0024H     UNIT         ?PR?_DELAYMS?BEEP
+            CODE    0C69H     0020H     UNIT         ?PR?_DELAY?BEEP
+            CODE    0C89H     000FH     UNIT         ?PR?TIMER0_ISR?BEEP
+            CODE    0C98H     000BH     UNIT         ?C_INITSEG
+
+
+
+OVERLAY MAP OF MODULE:   .\Objects\beep (?C_STARTUP)
+
+
+SEGMENT                           BIT_GROUP          DATA_GROUP 
+  +--> CALLED SEGMENT          START    LENGTH     START    LENGTH
+------------------------------------------------------------------
+?C_C51STARTUP                  -----    -----      -----    -----
+BL51 BANKED LINKER/LOCATER V6.22                                                      06/11/2025  22:01:14  PAGE 2
+
+
+  +--> ?PR?MAIN?BEEP
+  +--> ?C_INITSEG
+
+?PR?MAIN?BEEP                  0020H.1  0000H.1    0008H    000CH
+  +--> ?PR?KEYSCAN?BEEP
+  +--> ?PR?_DELAYMS?BEEP
+  +--> ?CO?BEEP
+  +--> ?PR?_PLAYSONG?BEEP
+
+?PR?KEYSCAN?BEEP               -----    -----      0014H    0001H
+  +--> ?PR?_DELAY?BEEP
+
+?PR?_PLAYSONG?BEEP             -----    -----      0014H    0006H
+  +--> ?PR?_PLAYNOTE?BEEP
+
+?PR?_PLAYNOTE?BEEP             -----    -----      001AH    0001H
+  +--> ?CO?BEEP
+  +--> ?PR?_DELAY?BEEP
+
+
+
+SYMBOL TABLE OF MODULE:  .\Objects\beep (?C_STARTUP)
+
+  VALUE           TYPE          NAME
+  ----------------------------------
+
+  -------         MODULE        ?C_STARTUP
+  C:0A56H         SEGMENT       ?C_C51STARTUP
+  I:0021H         SEGMENT       ?STACK
+  C:0000H         PUBLIC        ?C_STARTUP
+  D:00E0H         SYMBOL        ACC
+  D:00F0H         SYMBOL        B
+  D:0083H         SYMBOL        DPH
+  D:0082H         SYMBOL        DPL
+  N:0000H         SYMBOL        IBPSTACK
+  N:0100H         SYMBOL        IBPSTACKTOP
+  N:0080H         SYMBOL        IDATALEN
+  C:0A59H         SYMBOL        IDATALOOP
+  N:0000H         SYMBOL        PBPSTACK
+  N:0100H         SYMBOL        PBPSTACKTOP
+  N:0000H         SYMBOL        PDATALEN
+  N:0000H         SYMBOL        PDATASTART
+  N:0000H         SYMBOL        PPAGE
+  N:0000H         SYMBOL        PPAGEENABLE
+  D:00A0H         SYMBOL        PPAGE_SFR
+  D:0081H         SYMBOL        SP
+  C:0A56H         SYMBOL        STARTUP1
+  N:0000H         SYMBOL        XBPSTACK
+  N:0000H         SYMBOL        XBPSTACKTOP
+  N:0000H         SYMBOL        XDATALEN
+  N:0000H         SYMBOL        XDATASTART
+  C:0000H         LINE#         126
+  C:0A56H         LINE#         133
+  C:0A58H         LINE#         134
+  C:0A59H         LINE#         135
+  C:0A5AH         LINE#         136
+  C:0A5CH         LINE#         185
+BL51 BANKED LINKER/LOCATER V6.22                                                      06/11/2025  22:01:14  PAGE 3
+
+
+  C:0A5FH         LINE#         196
+  -------         ENDMOD        ?C_STARTUP
+
+  -------         MODULE        BEEP
+  C:0000H         SYMBOL        _ICE_DUMMY_
+  D:0080H         PUBLIC        P0
+  D:0090H         PUBLIC        P1
+  D:00A0H         PUBLIC        P2
+  D:00B0H         PUBLIC        P3
+  B:00A8H.7       PUBLIC        EA
+  D:00A8H         PUBLIC        IE
+  C:0BD1H         PUBLIC        twinkleNotes
+  C:0BFDH         PUBLIC        tigerBeats
+  C:0C69H         PUBLIC        _delay
+  D:00B8H         PUBLIC        IP
+  D:001BH         PUBLIC        T0RH
+  D:001DH         PUBLIC        T0RL
+  C:0C89H         PUBLIC        timer0_ISR
+  C:0800H         PUBLIC        main
+  C:0BEDH         PUBLIC        tigerNotes
+  D:0098H         PUBLIC        SCON
+  D:0089H         PUBLIC        TMOD
+  D:0088H         PUBLIC        TCON
+  C:0BB1H         PUBLIC        noteFreq
+  B:00A8H.1       PUBLIC        ET0
+  B:0080H.0       PUBLIC        BUZZ
+  D:008CH         PUBLIC        TH0
+  D:008AH         PUBLIC        TL0
+  C:0B4FH         PUBLIC        _playNote
+  C:0C0DH         PUBLIC        _playSong
+  C:0C49H         PUBLIC        _delayMs
+  B:0088H.4       PUBLIC        TR0
+  D:00C8H         PUBLIC        T2CON
+  B:0020H.0       PUBLIC        enable
+  C:0AE2H         PUBLIC        keyscan
+  C:0BDFH         PUBLIC        twinkleBeats
+  D:00D0H         PUBLIC        PSW
+  -------         PROC          _DELAY
+  D:0006H         SYMBOL        ms
+  -------         DO            
+  D:0004H         SYMBOL        i
+  D:0002H         SYMBOL        j
+  -------         ENDDO         
+  C:0C69H         LINE#         21
+  C:0C69H         LINE#         23
+  C:0C73H         LINE#         24
+  C:0C88H         LINE#         25
+  -------         ENDPROC       _DELAY
+  -------         PROC          TIMER0_ISR
+  C:0C89H         LINE#         27
+  C:0C89H         LINE#         28
+  C:0C8CH         LINE#         29
+  C:0C8FH         LINE#         31
+  C:0C92H         LINE#         32
+  C:0C95H         LINE#         34
+  C:0C97H         LINE#         35
+  -------         ENDPROC       TIMER0_ISR
+BL51 BANKED LINKER/LOCATER V6.22                                                      06/11/2025  22:01:14  PAGE 4
+
+
+  -------         PROC          KEYSCAN
+  -------         DO            
+  D:0001H         SYMBOL        i
+  D:0007H         SYMBOL        temp
+  D:0014H         SYMBOL        keynum
+  -------         ENDDO         
+  C:0AE2H         LINE#         38
+  C:0AE2H         LINE#         39
+  C:0AE5H         LINE#         41
+  C:0AE7H         LINE#         42
+  C:0AF5H         LINE#         43
+  C:0AF9H         LINE#         44
+  C:0AFDH         LINE#         45
+  C:0B04H         LINE#         46
+  C:0B09H         LINE#         47
+  C:0B0DH         LINE#         48
+  C:0B1AH         LINE#         49
+  C:0B28H         LINE#         50
+  C:0B37H         LINE#         51
+  C:0B44H         LINE#         52
+  C:0B46H         LINE#         53
+  C:0B46H         LINE#         54
+  C:0B46H         LINE#         55
+  C:0B4CH         LINE#         56
+  C:0B4EH         LINE#         57
+  -------         ENDPROC       KEYSCAN
+  -------         PROC          _PLAYNOTE
+  D:0007H         SYMBOL        noteIndex
+  D:001AH         SYMBOL        beat
+  -------         DO            
+  D:0004H         SYMBOL        rld
+  -------         ENDDO         
+  C:0B4FH         LINE#         70
+  C:0B51H         LINE#         73
+  C:0B57H         LINE#         74
+  C:0B5AH         LINE#         76
+  C:0B5AH         LINE#         78
+  C:0B8FH         LINE#         79
+  C:0B94H         LINE#         80
+  C:0B99H         LINE#         82
+  C:0B9BH         LINE#         83
+  C:0BA7H         LINE#         84
+  C:0BA9H         LINE#         85
+  C:0BB0H         LINE#         86
+  -------         ENDPROC       _PLAYNOTE
+  -------         PROC          _PLAYSONG
+  D:0014H         SYMBOL        notes
+  D:0016H         SYMBOL        beats
+  D:0018H         SYMBOL        length
+  -------         DO            
+  D:0019H         SYMBOL        i
+  -------         ENDDO         
+  C:0C0DH         LINE#         89
+  C:0C17H         LINE#         91
+  C:0C21H         LINE#         92
+  C:0C40H         LINE#         93
+  C:0C44H         LINE#         94
+BL51 BANKED LINKER/LOCATER V6.22                                                      06/11/2025  22:01:14  PAGE 5
+
+
+  -------         ENDPROC       _PLAYSONG
+  C:0C45H         SYMBOL        L?0064
+  -------         PROC          L?0063
+  -------         ENDPROC       L?0063
+  C:0C45H         SYMBOL        L?0064
+  -------         PROC          _DELAYMS
+  D:0006H         SYMBOL        ms
+  -------         DO            
+  D:0004H         SYMBOL        i
+  D:0002H         SYMBOL        j
+  -------         ENDDO         
+  C:0C49H         LINE#         97
+  C:0C49H         LINE#         99
+  C:0C53H         LINE#         100
+  C:0C68H         LINE#         101
+  -------         ENDPROC       _DELAYMS
+  -------         PROC          MAIN
+  -------         DO            
+  D:0008H         SYMBOL        key_now
+  D:0009H         SYMBOL        key_last
+  D:000AH         SYMBOL        current_time
+  D:000CH         SYMBOL        last_press_time
+  D:000EH         SYMBOL        double_click_max_interval
+  B:0020H.1       SYMBOL        is_playing_song
+  D:0010H         SYMBOL        playing_song_key
+  -------         DO            
+  D:0011H         SYMBOL        noteIndex
+  D:0012H         SYMBOL        rld
+  -------         ENDDO         
+  -------         ENDDO         
+  C:0800H         LINE#         103
+  C:0800H         LINE#         104
+  C:0803H         LINE#         105
+  C:0806H         LINE#         107
+  C:080BH         LINE#         108
+  C:080FH         LINE#         110
+  C:0815H         LINE#         112
+  C:0817H         LINE#         113
+  C:081AH         LINE#         114
+  C:081DH         LINE#         115
+  C:081FH         LINE#         116
+  C:0821H         LINE#         117
+  C:0823H         LINE#         121
+  C:0823H         LINE#         122
+  C:0828H         LINE#         124
+  C:082BH         LINE#         126
+  C:082EH         LINE#         127
+  C:0839H         LINE#         128
+  C:0850H         LINE#         129
+  C:0852H         LINE#         130
+  C:0852H         LINE#         132
+  C:085AH         LINE#         133
+  C:0860H         LINE#         135
+  C:0874H         LINE#         137
+  C:0878H         LINE#         138
+  C:087AH         LINE#         139
+  C:087CH         LINE#         140
+BL51 BANKED LINKER/LOCATER V6.22                                                      06/11/2025  22:01:14  PAGE 6
+
+
+  C:0886H         LINE#         141
+  C:0886H         LINE#         142
+  C:0886H         LINE#         143
+  C:088DH         LINE#         144
+  C:088FH         LINE#         145
+  C:0892H         LINE#         146
+  C:089FH         LINE#         147
+  C:08A1H         LINE#         148
+  C:08A4H         LINE#         149
+  C:08A4H         LINE#         150
+  C:08A9H         LINE#         151
+  C:08ABH         LINE#         155
+  C:08B1H         LINE#         156
+  C:08B1H         LINE#         159
+  C:08BBH         LINE#         161
+  C:08BEH         LINE#         162
+  C:08F5H         LINE#         163
+  C:08FAH         LINE#         164
+  C:0900H         LINE#         165
+  C:0902H         LINE#         167
+  C:0909H         LINE#         168
+  C:090CH         LINE#         169
+  C:090EH         LINE#         170
+  C:0910H         LINE#         171
+  C:0910H         LINE#         173
+  C:0913H         LINE#         174
+  C:0915H         LINE#         175
+  C:0918H         LINE#         176
+  C:091AH         LINE#         177
+  C:091AH         LINE#         179
+  C:091DH         LINE#         180
+  C:0928H         LINE#         181
+  C:0942H         LINE#         182
+  -------         ENDPROC       MAIN
+  -------         ENDMOD        BEEP
+
+  -------         MODULE        ?C?ULDIV
+  C:0981H         PUBLIC        ?C?ULDIV
+  -------         ENDMOD        ?C?ULDIV
+
+  -------         MODULE        ?C?SLCMP
+  C:0A13H         PUBLIC        ?C?SLCMP
+  -------         ENDMOD        ?C?SLCMP
+
+  -------         MODULE        ?C?LIMUL
+  C:0A29H         PUBLIC        ?C?LIMUL
+  -------         ENDMOD        ?C?LIMUL
+
+******************************************************************************
+* RESTRICTED VERSION WITH 0800H BYTE CODE SIZE LIMIT; USED: 0317H BYTE (38%) *
+******************************************************************************
+
+Program Size: data=32.2 xdata=0 code=1193
+LINK/LOCATE RUN COMPLETE.  0 WARNING(S),  0 ERROR(S)

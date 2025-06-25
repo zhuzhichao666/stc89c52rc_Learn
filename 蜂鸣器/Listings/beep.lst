@@ -1,0 +1,213 @@
+C51 COMPILER V9.54   BEEP                                                                  06/11/2025 22:01:14 PAGE 1   
+
+
+C51 COMPILER V9.54, COMPILATION OF MODULE BEEP
+OBJECT MODULE PLACED IN .\Objects\beep.obj
+COMPILER INVOKED BY: F:\Keil\C51\BIN\C51.EXE beep.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\beep.ls
+                    -t) TABS(2) OBJECT(.\Objects\beep.obj)
+
+line level    source
+
+   1          #include <reg52.h>
+   2          
+   3          #define CRYSTAL_FREQ 11059200UL
+   4          #define TIMER_DIVIDER 12UL
+   5          
+   6          #define RldTmr(frq) (65536 - (uint)(CRYSTAL_FREQ / TIMER_DIVIDER / ((uint)(frq) * 2UL)))
+   7          
+   8          typedef unsigned char uchar;
+   9          typedef unsigned int uint;
+  10          
+  11          sbit BUZZ = P0^0;
+  12          
+  13          bit enable = 0;
+  14          uint T0RH = 0, T0RL = 0;
+  15          
+  16          uint code noteFreq[] = {
+  17              262, 294, 330, 349, 392, 440, 494, 523,
+  18              587, 659, 698, 784, 880, 988, 1047, 1175
+  19          };
+  20          
+  21          void delay(uint ms) {
+  22   1          uint i, j;
+  23   1          for(i = 0; i < ms; i++)
+  24   1              for(j = 0; j < 123; j++);
+  25   1      }
+  26          
+  27          void timer0_ISR(void) interrupt 1 using 1 {
+  28   1          TH0 = T0RH;
+  29   1          TL0 = T0RL;
+  30   1      
+  31   1          if(enable)
+  32   1              BUZZ = ~BUZZ;
+  33   1          else
+  34   1              BUZZ = 1;
+  35   1      }
+  36          
+  37          // 4x4键盘扫描，返回0~15，没按返回0xFF
+  38          uchar keyscan() {
+  39   1          uchar i, temp, keynum = 0xFF;
+  40   1      
+  41   1          for(i = 0; i < 4; i++) {
+  42   2              P2 = ~(0x01 << i);
+  43   2              temp = P2 & 0xF0;
+  44   2              if(temp != 0xF0) {
+  45   3                  delay(10);  // 防抖
+  46   3                  temp = P2 & 0xF0;
+  47   3                  if(temp != 0xF0) {
+  48   4                      if((temp & 0x10) == 0) keynum = i * 4 + 0;
+  49   4                      else if((temp & 0x20) == 0) keynum = i * 4 + 1;
+  50   4                      else if((temp & 0x40) == 0) keynum = i * 4 + 2;
+  51   4                      else if((temp & 0x80) == 0) keynum = i * 4 + 3;
+  52   4                      break;
+  53   4                  }
+  54   3              }
+C51 COMPILER V9.54   BEEP                                                                  06/11/2025 22:01:14 PAGE 2   
+
+  55   2          }
+  56   1          return keynum;
+  57   1      }
+  58          
+  59          // 小星星曲调（数字表示音调索引）
+  60          uchar code twinkleNotes[] = {0,0,4,4,5,5,4,3,3,2,2,1,1,0};
+  61          uchar code twinkleBeats[] = {1,1,1,1,1,1,2,1,1,1,1,1,1,2};
+  62          #define TWINKLE_LEN (sizeof(twinkleNotes)/sizeof(twinkleNotes[0]))
+  63          
+  64          // 两只老虎曲调
+  65          uchar code tigerNotes[] = {0,1,2,0,0,1,2,0,2,3,4,0,2,3,4,0};
+  66          uchar code tigerBeats[] = {1,1,1,2,1,1,1,2,1,1,2,2,1,1,2,2};
+  67          #define TIGER_LEN (sizeof(tigerNotes)/sizeof(tigerNotes[0]))
+  68          
+  69          // 播放单个音符（noteIndex是noteFreq数组索引，beat是节拍，单位为250ms）
+  70          void playNote(uchar noteIndex, uchar beat) {
+  71   1          uint rld;
+  72   1      
+  73   1          if(noteIndex >= sizeof(noteFreq)/sizeof(noteFreq[0])) {
+  74   2              enable = 0;
+  75   2              return;
+  76   2          }
+  77   1      
+  78   1          rld = RldTmr(noteFreq[noteIndex]);
+  79   1          T0RH = (rld >> 8) & 0xFF;
+  80   1          T0RL = rld & 0xFF;
+  81   1      
+  82   1          enable = 1;
+  83   1          delay(beat * 250);
+  84   1          enable = 0;
+  85   1          delay(50);
+  86   1      }
+  87          
+  88          // 播放整首歌
+  89          void playSong(const uchar code *notes, const uchar code *beats, uchar length) {
+  90   1          uchar i;
+  91   1          for(i = 0; i < length; i++) {
+  92   2              playNote(notes[i], beats[i]);
+  93   2          }
+  94   1      }
+  95          
+  96          // 简单10ms延时
+  97          void delayMs(uint ms) {
+  98   1          uint i, j;
+  99   1          for(i = 0; i < ms; i++)
+ 100   1              for(j = 0; j < 123; j++);
+ 101   1      }
+ 102          
+ 103          void main() {
+ 104   1          uchar key_now = 0xFF;
+ 105   1          uchar key_last = 0xFF;
+ 106   1      
+ 107   1          uint current_time = 0;
+ 108   1          uint last_press_time = 0;
+ 109   1      
+ 110   1          uint double_click_max_interval = 300; // 300ms双击判定
+ 111   1      
+ 112   1          bit is_playing_song = 0;   // 标记是否正在播放歌曲（阻止按键冲突）
+ 113   1          uchar playing_song_key = 0xFF;
+ 114   1          TMOD = 0x01;  // 定时器0模式1
+ 115   1          EA = 1;
+ 116   1          ET0 = 1;
+C51 COMPILER V9.54   BEEP                                                                  06/11/2025 22:01:14 PAGE 3   
+
+ 117   1          TR0 = 1;
+ 118   1      
+ 119   1      
+ 120   1      
+ 121   1          while(1) {
+ 122   2              key_now = keyscan();
+ 123   2      
+ 124   2              if(is_playing_song) {
+ 125   3                  // 正在播放歌曲，忽略按键
+ 126   3                  delayMs(10);
+ 127   3                  current_time += 10;
+ 128   3                  if(current_time > 60000) current_time = 0;
+ 129   3                  continue;
+ 130   3              }
+ 131   2      
+ 132   2              if(key_now != 0xFF) {
+ 133   3                  if(key_now == key_last) {
+ 134   4                      // 双击检测
+ 135   4                      if(current_time - last_press_time < double_click_max_interval) {
+ 136   5                          // 触发双击
+ 137   5                          if(key_now == 0) {
+ 138   6                              is_playing_song = 1;
+ 139   6                              playing_song_key = 0;
+ 140   6                              playSong(twinkleNotes, twinkleBeats, TWINKLE_LEN);
+ 141   6                              is_playing_song = 0;
+ 142   6                              playing_song_key = 0xFF;
+ 143   6                          } else if(key_now == 1) {
+ 144   6                              is_playing_song = 1;
+ 145   6                              playing_song_key = 1;
+ 146   6                              playSong(tigerNotes, tigerBeats, TIGER_LEN);
+ 147   6                              is_playing_song = 0;
+ 148   6                              playing_song_key = 0xFF;
+ 149   6                          }
+ 150   5                          last_press_time = 0; // 处理完毕，重置计时
+ 151   5                      } else {
+ 152   5                          last_press_time = current_time;
+ 153   5                      }
+ 154   4                  } else {
+ 155   4                      last_press_time = current_time;
+ 156   4                  }
+ 157   3      
+ 158   3                  // 如果是非0和1按键，长按播放对应音调
+ 159   3                  if(key_now >= 2 && !is_playing_song) {
+ 160   4                      // 连续发声直到松开
+ 161   4                      uchar noteIndex = key_now;
+ 162   4                      uint rld = RldTmr(noteFreq[noteIndex]);
+ 163   4                      T0RH = (rld >> 8) & 0xFF;
+ 164   4                      T0RL = rld & 0xFF;
+ 165   4                      enable = 1;
+ 166   4                      // 等待松开
+ 167   4                      while(keyscan() == key_now) {
+ 168   5                          delayMs(10);
+ 169   5                      }
+ 170   4                      enable = 0;
+ 171   4                  }
+ 172   3      
+ 173   3                  key_last = key_now;
+ 174   3              } else {
+ 175   3                  key_last = 0xFF;
+ 176   3                  enable = 0; // 松开按键，停止声音
+ 177   3              }
+ 178   2      
+C51 COMPILER V9.54   BEEP                                                                  06/11/2025 22:01:14 PAGE 4   
+
+ 179   2              delayMs(10);
+ 180   2              current_time += 10;
+ 181   2              if(current_time > 60000) current_time = 0;  // 避免溢出
+ 182   2          }
+ 183   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    671    ----
+   CONSTANT SIZE    =     92    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      4      20
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =      1       1
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

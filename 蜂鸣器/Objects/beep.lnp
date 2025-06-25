@@ -1,0 +1,4 @@
+".\Objects\STARTUP.obj",
+".\Objects\beep.obj" 
+TO ".\Objects\beep" 
+PRINT(".\Listings\beep.m51")
