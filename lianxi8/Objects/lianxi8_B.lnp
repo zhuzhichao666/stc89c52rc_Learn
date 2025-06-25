@@ -1,0 +1,4 @@
+".\Objects\lianxi8_B.obj",
+".\Objects\STARTUP.obj" 
+TO ".\Objects\lianxi8_B" 
+PRINT(".\Listings\lianxi8_B.m51")
