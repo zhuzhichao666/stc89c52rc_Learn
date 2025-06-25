@@ -1,0 +1,358 @@
+BL51 BANKED LINKER/LOCATER V6.22                                                        04/07/2025  02:23:27  PAGE 1
+
+
+BL51 BANKED LINKER/LOCATER V6.22, INVOKED BY:
+F:\KEIL\C51\BIN\BL51.EXE .\Objects\STARTUP.obj, .\Objects\lianxi5.obj TO .\Objects\lianxi5 PRINT (.\Listings\lianxi5.m51
+>> )
+
+
+MEMORY MODEL: SMALL
+
+
+INPUT MODULES INCLUDED:
+  .\Objects\STARTUP.obj (?C_STARTUP)
+  .\Objects\lianxi5.obj (LIANXI5)
+
+
+LINK MAP OF MODULE:  .\Objects\lianxi5 (?C_STARTUP)
+
+
+            TYPE    BASE      LENGTH    RELOCATION   SEGMENT NAME
+            -----------------------------------------------------
+
+            * * * * * * *   D A T A   M E M O R Y   * * * * * * *
+            REG     0000H     0008H     ABSOLUTE     "REG BANK 0"
+            DATA    0008H     0004H     UNIT         _DATA_GROUP_
+                    000CH     0014H                  *** GAP ***
+            BIT     0020H.0   0000H.1   UNIT         _BIT_GROUP_
+                    0020H.1   0000H.7                *** GAP ***
+            IDATA   0021H     0001H     UNIT         ?STACK
+
+            * * * * * * *   C O D E   M E M O R Y   * * * * * * *
+            CODE    0000H     0003H     ABSOLUTE     
+                    0003H     07FDH                  *** GAP ***
+            CODE    0800H     006FH     UNIT         ?PR?OLED_INIT?LIANXI5
+            CODE    086FH     004BH     UNIT         ?PR?_I2C_WRITEBYTE?LIANXI5
+            CODE    08BAH     0047H     UNIT         ?PR?_OLED_DISPLAYCHAR?LIANXI5
+            CODE    0901H     0032H     UNIT         ?PR?MAIN?LIANXI5
+            CODE    0933H     002FH     UNIT         ?PR?OLED_CLEAR?LIANXI5
+            CODE    0962H     002CH     UNIT         ?PR?_OLED_SETPOS?LIANXI5
+            CODE    098EH     0020H     UNIT         ?CO?LIANXI5
+            CODE    09AEH     001BH     UNIT         ?PR?_DELAY_US?LIANXI5
+            CODE    09C9H     001BH     UNIT         ?PR?_OLED_DISPLAYNUMBER?LIANXI5
+            CODE    09E4H     0017H     UNIT         ?PR?I2C_START?LIANXI5
+            CODE    09FBH     0014H     UNIT         ?PR?I2C_STOP?LIANXI5
+            CODE    0A0FH     000CH     UNIT         ?C_C51STARTUP
+
+
+
+OVERLAY MAP OF MODULE:   .\Objects\lianxi5 (?C_STARTUP)
+
+
+SEGMENT                                    BIT_GROUP          DATA_GROUP 
+  +--> CALLED SEGMENT                   START    LENGTH     START    LENGTH
+---------------------------------------------------------------------------
+?C_C51STARTUP                           -----    -----      -----    -----
+  +--> ?PR?MAIN?LIANXI5
+
+?PR?MAIN?LIANXI5                        -----    -----      0008H    0002H
+  +--> ?PR?OLED_INIT?LIANXI5
+  +--> ?PR?OLED_CLEAR?LIANXI5
+  +--> ?PR?_OLED_DISPLAYNUMBER?LIANXI5
+BL51 BANKED LINKER/LOCATER V6.22                                                      04/07/2025  02:23:27  PAGE 2
+
+
+  +--> ?PR?_DELAY_US?LIANXI5
+
+?PR?OLED_INIT?LIANXI5                   -----    -----      -----    -----
+  +--> ?PR?I2C_START?LIANXI5
+  +--> ?PR?_I2C_WRITEBYTE?LIANXI5
+  +--> ?PR?I2C_STOP?LIANXI5
+
+?PR?I2C_START?LIANXI5                   -----    -----      -----    -----
+  +--> ?PR?_DELAY_US?LIANXI5
+
+?PR?_I2C_WRITEBYTE?LIANXI5              0020H.0  0000H.1    -----    -----
+  +--> ?CO?LIANXI5
+  +--> ?PR?_DELAY_US?LIANXI5
+
+?PR?I2C_STOP?LIANXI5                    -----    -----      -----    -----
+  +--> ?PR?_DELAY_US?LIANXI5
+
+?PR?OLED_CLEAR?LIANXI5                  -----    -----      000AH    0001H
+  +--> ?PR?_OLED_SETPOS?LIANXI5
+  +--> ?PR?I2C_START?LIANXI5
+  +--> ?PR?_I2C_WRITEBYTE?LIANXI5
+  +--> ?PR?I2C_STOP?LIANXI5
+
+?PR?_OLED_SETPOS?LIANXI5                -----    -----      -----    -----
+  +--> ?PR?I2C_START?LIANXI5
+  +--> ?PR?_I2C_WRITEBYTE?LIANXI5
+  +--> ?PR?I2C_STOP?LIANXI5
+
+?PR?_OLED_DISPLAYNUMBER?LIANXI5         -----    -----      -----    -----
+  +--> ?PR?_OLED_DISPLAYCHAR?LIANXI5
+
+?PR?_OLED_DISPLAYCHAR?LIANXI5           -----    -----      000AH    0002H
+  +--> ?PR?_OLED_SETPOS?LIANXI5
+  +--> ?PR?I2C_START?LIANXI5
+  +--> ?PR?_I2C_WRITEBYTE?LIANXI5
+  +--> ?PR?I2C_STOP?LIANXI5
+
+
+
+SYMBOL TABLE OF MODULE:  .\Objects\lianxi5 (?C_STARTUP)
+
+  VALUE           TYPE          NAME
+  ----------------------------------
+
+  -------         MODULE        ?C_STARTUP
+  C:0A0FH         SEGMENT       ?C_C51STARTUP
+  I:0021H         SEGMENT       ?STACK
+  C:0000H         PUBLIC        ?C_STARTUP
+  D:00E0H         SYMBOL        ACC
+  D:00F0H         SYMBOL        B
+  D:0083H         SYMBOL        DPH
+  D:0082H         SYMBOL        DPL
+  N:0000H         SYMBOL        IBPSTACK
+  N:0100H         SYMBOL        IBPSTACKTOP
+  N:0080H         SYMBOL        IDATALEN
+  C:0A12H         SYMBOL        IDATALOOP
+  N:0000H         SYMBOL        PBPSTACK
+BL51 BANKED LINKER/LOCATER V6.22                                                      04/07/2025  02:23:27  PAGE 3
+
+
+  N:0100H         SYMBOL        PBPSTACKTOP
+  N:0000H         SYMBOL        PDATALEN
+  N:0000H         SYMBOL        PDATASTART
+  N:0000H         SYMBOL        PPAGE
+  N:0000H         SYMBOL        PPAGEENABLE
+  D:00A0H         SYMBOL        PPAGE_SFR
+  D:0081H         SYMBOL        SP
+  C:0A0FH         SYMBOL        STARTUP1
+  N:0000H         SYMBOL        XBPSTACK
+  N:0000H         SYMBOL        XBPSTACKTOP
+  N:0000H         SYMBOL        XDATALEN
+  N:0000H         SYMBOL        XDATASTART
+  C:0000H         LINE#         126
+  C:0A0FH         LINE#         133
+  C:0A11H         LINE#         134
+  C:0A12H         LINE#         135
+  C:0A13H         LINE#         136
+  C:0A15H         LINE#         185
+  C:0A18H         LINE#         196
+  -------         ENDMOD        ?C_STARTUP
+
+  -------         MODULE        LIANXI5
+  C:0000H         SYMBOL        _ICE_DUMMY_
+  D:0080H         PUBLIC        P0
+  C:098EH         PUBLIC        font16x16
+  C:0800H         PUBLIC        OLED_Init
+  C:0901H         PUBLIC        main
+  C:09E4H         PUBLIC        I2C_Start
+  C:088BH         PUBLIC        _I2C_WriteByte
+  C:09FBH         PUBLIC        I2C_Stop
+  C:09C9H         PUBLIC        _OLED_DisplayNumber
+  B:0080H.1       PUBLIC        SDA
+  C:09BBH         PUBLIC        _delay_us
+  C:08BAH         PUBLIC        _OLED_DisplayChar
+  B:0080H.0       PUBLIC        SCL
+  C:0962H         PUBLIC        _OLED_SetPos
+  C:0933H         PUBLIC        OLED_Clear
+  C:09B7H         SYMBOL        L?0040
+  -------         PROC          L?0039
+  -------         ENDPROC       L?0039
+  C:09B7H         SYMBOL        L?0040
+  -------         PROC          _DELAY_US
+  D:0006H         SYMBOL        us
+  C:09BBH         LINE#         8
+  C:09BBH         LINE#         9
+  C:09BBH         LINE#         10
+  C:09C8H         LINE#         11
+  -------         ENDPROC       _DELAY_US
+  -------         PROC          I2C_START
+  C:09E4H         LINE#         14
+  C:09E4H         LINE#         15
+  C:09E4H         LINE#         16
+  C:09E6H         LINE#         17
+  C:09E8H         LINE#         18
+  C:09EFH         LINE#         19
+  C:09F1H         LINE#         20
+  C:09F8H         LINE#         21
+BL51 BANKED LINKER/LOCATER V6.22                                                      04/07/2025  02:23:27  PAGE 4
+
+
+  C:09FAH         LINE#         22
+  -------         ENDPROC       I2C_START
+  -------         PROC          I2C_STOP
+  C:09FBH         LINE#         25
+  C:09FBH         LINE#         26
+  C:09FBH         LINE#         27
+  C:09FDH         LINE#         28
+  C:09FFH         LINE#         29
+  C:0A06H         LINE#         30
+  C:0A08H         LINE#         31
+  -------         ENDPROC       I2C_STOP
+  -------         PROC          L?0041
+  -------         ENDPROC       L?0041
+  -------         PROC          _I2C_WRITEBYTE
+  D:0005H         SYMBOL        byte
+  -------         DO            
+  D:0003H         SYMBOL        i
+  B:0020H.0       SYMBOL        ack
+  -------         ENDDO         
+  C:088BH         LINE#         35
+  C:088DH         LINE#         36
+  C:088DH         LINE#         39
+  C:088FH         LINE#         40
+  C:088FH         LINE#         41
+  C:0899H         LINE#         42
+  C:0899H         LINE#         43
+  C:0899H         LINE#         44
+  C:089CH         LINE#         45
+  C:089EH         LINE#         46
+  C:08A1H         LINE#         47
+  C:08A5H         LINE#         48
+  C:08A9H         LINE#         49
+  C:08ABH         LINE#         50
+  C:08ABH         LINE#         51
+  C:08ABH         LINE#         52
+  C:08AEH         LINE#         53
+  C:08B2H         LINE#         54
+  C:08B4H         LINE#         55
+  C:08B7H         LINE#         56
+  C:08B9H         LINE#         57
+  -------         ENDPROC       _I2C_WRITEBYTE
+  -------         PROC          OLED_INIT
+  C:0800H         LINE#         60
+  C:0800H         LINE#         61
+  C:0800H         LINE#         62
+  C:0803H         LINE#         63
+  C:0808H         LINE#         64
+  C:080DH         LINE#         65
+  C:0812H         LINE#         66
+  C:0817H         LINE#         67
+  C:081CH         LINE#         68
+  C:0821H         LINE#         69
+  C:0826H         LINE#         70
+  C:082BH         LINE#         71
+  C:0830H         LINE#         72
+  C:0835H         LINE#         73
+  C:083AH         LINE#         74
+BL51 BANKED LINKER/LOCATER V6.22                                                      04/07/2025  02:23:27  PAGE 5
+
+
+  C:083FH         LINE#         75
+  C:0844H         LINE#         76
+  C:0849H         LINE#         77
+  C:084EH         LINE#         78
+  C:0853H         LINE#         79
+  C:0858H         LINE#         80
+  C:085DH         LINE#         81
+  C:0862H         LINE#         82
+  C:0867H         LINE#         83
+  C:086CH         LINE#         84
+  -------         ENDPROC       OLED_INIT
+  -------         PROC          _OLED_SETPOS
+  D:0002H         SYMBOL        x
+  D:0001H         SYMBOL        page
+  C:0962H         LINE#         88
+  C:0966H         LINE#         89
+  C:0966H         LINE#         90
+  C:0969H         LINE#         91
+  C:096EH         LINE#         92
+  C:0973H         LINE#         93
+  C:097AH         LINE#         94
+  C:0981H         LINE#         95
+  C:098BH         LINE#         96
+  -------         ENDPROC       _OLED_SETPOS
+  -------         PROC          OLED_CLEAR
+  -------         DO            
+  D:000AH         SYMBOL        page
+  D:0002H         SYMBOL        col
+  -------         ENDDO         
+  C:0933H         LINE#         110
+  C:0933H         LINE#         111
+  C:0933H         LINE#         113
+  C:0936H         LINE#         114
+  C:0936H         LINE#         115
+  C:093DH         LINE#         116
+  C:0940H         LINE#         117
+  C:0945H         LINE#         118
+  C:094AH         LINE#         119
+  C:094CH         LINE#         120
+  C:094CH         LINE#         121
+  C:0951H         LINE#         122
+  C:0955H         LINE#         123
+  C:0958H         LINE#         124
+  C:0961H         LINE#         125
+  -------         ENDPROC       OLED_CLEAR
+  -------         PROC          _OLED_DISPLAYCHAR
+  D:0007H         SYMBOL        c
+  -------         DO            
+  D:0002H         SYMBOL        j
+  D:000AH         SYMBOL        pos
+  D:000BH         SYMBOL        char_index
+  -------         ENDDO         
+  C:08BAH         LINE#         128
+  C:08BAH         LINE#         129
+  C:08BAH         LINE#         130
+  C:08BDH         LINE#         131
+  C:08C1H         LINE#         134
+BL51 BANKED LINKER/LOCATER V6.22                                                      04/07/2025  02:23:27  PAGE 6
+
+
+  C:08C8H         LINE#         135
+  C:08CBH         LINE#         136
+  C:08D0H         LINE#         137
+  C:08D5H         LINE#         138
+  C:08D7H         LINE#         139
+  C:08DEH         LINE#         140
+  C:08E1H         LINE#         143
+  C:08E8H         LINE#         144
+  C:08EBH         LINE#         145
+  C:08F0H         LINE#         146
+  C:08F5H         LINE#         147
+  C:08F7H         LINE#         148
+  C:08FEH         LINE#         149
+  -------         ENDPROC       _OLED_DISPLAYCHAR
+  -------         PROC          _OLED_DISPLAYNUMBER
+  D:0006H         SYMBOL        num
+  -------         DO            
+  D:0007H         SYMBOL        digit
+  -------         ENDDO         
+  C:09C9H         LINE#         153
+  C:09C9H         LINE#         154
+  C:09C9H         LINE#         156
+  C:09DCH         LINE#         157
+  C:09DCH         LINE#         158
+  C:09E0H         LINE#         159
+  C:09E3H         LINE#         160
+  C:09E3H         LINE#         161
+  -------         ENDPROC       _OLED_DISPLAYNUMBER
+  -------         PROC          MAIN
+  -------         DO            
+  D:0008H         SYMBOL        countdown
+  -------         ENDDO         
+  C:0901H         LINE#         164
+  C:0901H         LINE#         165
+  C:0901H         LINE#         166
+  C:0907H         LINE#         168
+  C:090AH         LINE#         169
+  C:090DH         LINE#         171
+  C:0916H         LINE#         172
+  C:0916H         LINE#         173
+  C:0919H         LINE#         174
+  C:0920H         LINE#         175
+  C:0927H         LINE#         176
+  C:092FH         LINE#         177
+  C:0931H         LINE#         179
+  -------         ENDPROC       MAIN
+  -------         ENDMOD        LIANXI5
+
+******************************************************************************
+* RESTRICTED VERSION WITH 0800H BYTE CODE SIZE LIMIT; USED: 021EH BYTE (26%) *
+******************************************************************************
+
+Program Size: data=13.1 xdata=0 code=542
+LINK/LOCATE RUN COMPLETE.  0 WARNING(S),  0 ERROR(S)

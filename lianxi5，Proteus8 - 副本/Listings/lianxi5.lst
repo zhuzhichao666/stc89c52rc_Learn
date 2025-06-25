@@ -1,0 +1,210 @@
+C51 COMPILER V9.54   LIANXI5                                                               04/07/2025 02:23:27 PAGE 1   
+
+
+C51 COMPILER V9.54, COMPILATION OF MODULE LIANXI5
+OBJECT MODULE PLACED IN .\Objects\lianxi5.obj
+COMPILER INVOKED BY: F:\Keil\C51\BIN\C51.EXE lianxi5.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\lian
+                    -xi5.lst) TABS(2) OBJECT(.\Objects\lianxi5.obj)
+
+line level    source
+
+   1          #include <reg51.h>
+   2          #include <intrins.h>
+   3          
+   4          sbit SCL = P0^0;
+   5          sbit SDA = P0^1;
+   6          
+   7          // ????(12MHz????)
+   8          void delay_us(unsigned int us)
+   9          {
+  10   1          while (us--) _nop_();
+  11   1      }
+  12          
+  13          // I2C??  
+  14          void I2C_Start(void)
+  15          {
+  16   1          SDA = 1;
+  17   1          SCL = 1;
+  18   1          delay_us(5);
+  19   1          SDA = 0;
+  20   1          delay_us(5);
+  21   1          SCL = 0;
+  22   1      }
+  23          
+  24          // I2C??  
+  25          void I2C_Stop(void)
+  26          {
+  27   1          SDA = 0;
+  28   1          SCL = 1;
+  29   1          delay_us(5);
+  30   1          SDA = 1;
+  31   1          delay_us(5);
+  32   1      }
+  33          
+  34          // I2C?????  
+  35          bit I2C_WriteByte(unsigned char byte)
+  36          {
+  37   1          unsigned char i;
+  38   1          bit ack;
+  39   1          for (i = 0; i < 8; i++)
+  40   1          {
+  41   2              SDA = (byte & 0x80) ? 1 : 0;
+  42   2              delay_us(2);
+  43   2              SCL = 1;
+  44   2              delay_us(2);
+  45   2              SCL = 0;
+  46   2              delay_us(2);
+  47   2              byte <<= 1;
+  48   2          }
+  49   1          SDA = 1;
+  50   1          delay_us(2);
+  51   1          SCL = 1;
+  52   1          delay_us(2);
+  53   1          ack = SDA;
+  54   1          SCL = 0;
+C51 COMPILER V9.54   LIANXI5                                                               04/07/2025 02:23:27 PAGE 2   
+
+  55   1          delay_us(2);
+  56   1          return ack;
+  57   1      }
+  58          
+  59          // OLED???(SSD1306 128x64)
+  60          void OLED_Init(void)
+  61          {
+  62   1          I2C_Start();
+  63   1          I2C_WriteByte(0x78);  // OLED I2C??
+  64   1          I2C_WriteByte(0x00);  // ????
+  65   1          I2C_WriteByte(0xAE);  // ????
+  66   1          I2C_WriteByte(0xD5);  // ??????
+  67   1          I2C_WriteByte(0x80);  // ??????
+  68   1          I2C_WriteByte(0xA8);  // ???????
+  69   1          I2C_WriteByte(0x3F);  // 128x64???,63?(0x3F)
+  70   1          I2C_WriteByte(0xD3);  // ??????
+  71   1          I2C_WriteByte(0x00);  // ???
+  72   1          I2C_WriteByte(0x40);  // ?????  
+  73   1          I2C_WriteByte(0x8D);  // ????? 
+  74   1          I2C_WriteByte(0x14);  // ?????  
+  75   1          I2C_WriteByte(0x20);  // ??????
+  76   1          I2C_WriteByte(0x00);  // ??????
+  77   1          I2C_WriteByte(0xA0);  // ??????
+  78   1          I2C_WriteByte(0xC0);  // ??????
+  79   1          I2C_WriteByte(0xDA);  // ??COM??????
+  80   1          I2C_WriteByte(0x12);  // ??COM????
+  81   1          I2C_WriteByte(0x81);  // ??????
+  82   1          I2C_WriteByte(0xCF);  // ??????
+  83   1          I2C_WriteByte(0xAF);  // ????
+  84   1          I2C_Stop();
+  85   1      }
+  86          
+  87          // ??OLED????(x, page)
+  88          void OLED_SetPos(unsigned char x, unsigned char page)
+  89          {
+  90   1          I2C_Start();
+  91   1          I2C_WriteByte(0x78);
+  92   1          I2C_WriteByte(0x00);  // ????
+  93   1          I2C_WriteByte(0xB0 | page);  // ?????(0-7)
+  94   1          I2C_WriteByte(x & 0x0F);     // ??????4?
+  95   1          I2C_WriteByte(0x10 | (x >> 4));  // ??????4?
+  96   1          I2C_Stop();
+  97   1      }
+  98          
+  99          // 16x16??(??'1')
+ 100          const unsigned char code font16x16[][32] = {
+ 101              // ?? '1'
+ 102              {0x00, 0x18, 0x38, 0x58, 0x78, 0x18, 0x18, 0x18, 
+ 103               0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18,
+ 104               0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+ 105               0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+ 106              // Add other digits if necessary for '0', '2', '3', etc.
+ 107          };
+ 108          
+ 109          // ??????
+ 110          void OLED_Clear(void)
+ 111          {
+ 112   1          unsigned char page, col;
+ 113   1          for (page = 0; page < 8; page++)
+ 114   1          {
+ 115   2              OLED_SetPos(0, page);
+ 116   2              I2C_Start();
+C51 COMPILER V9.54   LIANXI5                                                               04/07/2025 02:23:27 PAGE 3   
+
+ 117   2              I2C_WriteByte(0x78);
+ 118   2              I2C_WriteByte(0x40);  // ????  
+ 119   2              for (col = 0; col < 128; col++)
+ 120   2              {
+ 121   3                  I2C_WriteByte(0x00);  // ????  
+ 122   3              }
+ 123   2              I2C_Stop();
+ 124   2          }
+ 125   1      }
+ 126          
+ 127          // ????  
+ 128          void OLED_DisplayChar(char c)
+ 129          {
+ 130   1          unsigned char j, pos = 56;  // ??????,(128 - 16) / 2 = 56
+ 131   1          unsigned char char_index = (c == '1') ? 0 : 0;  // ????? '1'
+ 132   1      
+ 133   1          // ?????????  
+ 134   1          OLED_SetPos(pos, 2);
+ 135   1          I2C_Start();
+ 136   1          I2C_WriteByte(0x78);
+ 137   1          I2C_WriteByte(0x40);  // ????  
+ 138   1          for (j = 0; j < 16; j++)
+ 139   1              I2C_WriteByte(font16x16[char_index][j]);
+ 140   1          I2C_Stop();
+ 141   1      
+ 142   1          // ?????????  
+ 143   1          OLED_SetPos(pos, 3);
+ 144   1          I2C_Start();
+ 145   1          I2C_WriteByte(0x78);
+ 146   1          I2C_WriteByte(0x40);  // ????  
+ 147   1          for (j = 16; j < 32; j++)
+ 148   1              I2C_WriteByte(font16x16[char_index][j]);
+ 149   1          I2C_Stop();
+ 150   1      }
+ 151          
+ 152          // ????  
+ 153          void OLED_DisplayNumber(int num)
+ 154          {
+ 155   1          char digit;
+ 156   1          if (num >= 0 && num <= 9)
+ 157   1          {
+ 158   2              digit = num + '0';  // Convert number to character
+ 159   2              OLED_DisplayChar(digit);  // Display the character on the screen
+ 160   2          }
+ 161   1      }
+ 162          
+ 163          // ???  
+ 164          void main(void)
+ 165          {
+ 166   1          int countdown = 10;  // Start from 10
+ 167   1      
+ 168   1          OLED_Init();             // ???OLED
+ 169   1          OLED_Clear();            // ????  
+ 170   1      
+ 171   1          while (countdown >= 0)
+ 172   1          {
+ 173   2              OLED_Clear();            // Clear the screen each time to update the countdown
+ 174   2              OLED_DisplayNumber(countdown);  // Display the countdown number
+ 175   2              delay_us(1000000);  // Delay for 1 second
+ 176   2              countdown--;  // Decrement the countdown
+ 177   2          }
+ 178   1      
+C51 COMPILER V9.54   LIANXI5                                                               04/07/2025 02:23:27 PAGE 4   
+
+ 179   1          while (1);  // End of countdown, keep the microcontroller in a loop
+ 180   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    495    ----
+   CONSTANT SIZE    =     32    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----       5
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----       1
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

@@ -1,0 +1,70 @@
+C51 COMPILER V9.54   LIANXI61                                                              04/08/2025 23:49:22 PAGE 1   
+
+
+C51 COMPILER V9.54, COMPILATION OF MODULE LIANXI61
+OBJECT MODULE PLACED IN .\Objects\lianxi61.obj
+COMPILER INVOKED BY: F:\Keil\C51\BIN\C51.EXE lianxi61.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\lia
+                    -nxi61.lst) TABS(2) OBJECT(.\Objects\lianxi61.obj)
+
+line level    source
+
+   1          #include <reg51.h>
+   2          
+   3          
+   4          unsigned char tab[] = {
+   5              0xc0,  // 0
+   6              0xf9,  // 1
+   7              0xa4,  // 2
+   8              0xb0,  // 3
+   9              0x99,  // 4
+  10              0x92,  // 5
+  11              0x82,  // 6
+  12              0xf8,  // 7
+  13              0x80,  // 8
+  14              0x90   // 9
+  15          };
+  16          
+  17          void delay(unsigned int t)
+  18          {
+  19   1        while(t--);
+  20   1      }
+  21          
+  22          void main()
+  23          { 
+  24   1        
+  25   1        while(1)
+  26   1        {
+  27   2          
+  28   2          P2 = 0x01;
+  29   2          P0 =  tab[0];
+  30   2          delay(500);
+  31   2          
+  32   2          P2 = 0x02;
+  33   2          P0 =  tab[1];
+  34   2          delay(500);
+  35   2          
+  36   2          P2 = 0x04;
+  37   2          P0 =  tab[2];
+  38   2          delay(500);
+  39   2          
+  40   2          P2 = 0x08;
+  41   2          P0 =  tab[3];
+  42   2          delay(500);
+  43   2        }
+  44   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     53    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     10    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+C51 COMPILER V9.54   LIANXI61                                                              04/08/2025 23:49:22 PAGE 2   
+
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
